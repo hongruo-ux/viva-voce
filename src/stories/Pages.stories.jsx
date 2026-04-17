@@ -1,12 +1,12 @@
 import { useState } from 'react'
 import '../tokens.css'
-import '../pages/pages.css'
-import Header from '../components/Header'
-import Footer from '../components/Footer'
-import HomePage    from '../pages/HomePage'
-import PLPPage     from '../pages/PLPPage'
-import PDPPage     from '../pages/PDPPage'
-import { BrandsPage, BlogPage, CartPage, AccountPage } from '../pages/PDPPage'
+import '../pages.css'
+import Header from '../Header.jsx'
+import Footer from '../Footer.jsx'
+import HomePage    from '../HomePage.jsx'
+import PLPPage     from '../PLPPage.jsx'
+import PDPPage     from '../PDPPage.jsx'
+import { BrandsPage, BlogPage, CartPage, AccountPage } from '../PDPPage.jsx'
 
 // Wrapper that gives every story a working Header + Footer + navigation
 function PageWrapper({ initialPage }) {

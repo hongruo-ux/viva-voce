@@ -31,3 +31,17 @@ input:focus-visible,textarea:focus-visible,select:focus-visible { outline: var(-
 @media (prefers-reduced-motion: reduce) { *,*::before,*::after { animation-duration: 0.01ms!important; transition-duration: 0.01ms!important; } }
 @media (max-width: 1024px) { h1 { font-size: var(--text-5xl); } h2 { font-size: var(--text-4xl); } }
 @media (max-width: 744px) { h1 { font-size: var(--text-4xl); } h2 { font-size: var(--text-3xl); } h3 { font-size: var(--text-2xl); } }
+
+button, .btn, [class*="btn"] {
+  border-radius: 6.25rem !important;
+  min-height: 48px !important;
+}
+
+img, .card, [class*="card"], [class*="product"] {
+  border-radius: 0 !important;
+}
+
+body {
+  font-family: 'Sharp Earth OL', Roboto, sans-serif;
+  color: #1a1a18;
+}

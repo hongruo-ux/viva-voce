@@ -1,223 +1,145 @@
-import { useState } from 'react'
-import './Header.css'
+import { useState, useEffect, useRef } from 'react';
+import './Header.css';
 
-const megaMenuData = {
-  "What's New": {
-    categories: [
-      { title: "WHAT ARE YOU LOOKING FOR?", items: ["Going-Out Edit","Modern Workwear","Spring Arrivals","The Capsule Edit","Under $100"] },
-      { title: "OUR EDITS",                 items: ["Clothing Staples","Designer Boutique","Editors' Picks","Fashion Finds Under $200"] },
-      { title: "NOW TRENDING",              items: ["Iconic Minimalism","Pastel Palette","Primary Colors","Sheer Dressing","Relaxed Tailoring"] },
-    ],
-    featured: { title: "Most Hearted" },
-  },
-  Summer: {
-    categories: [
-      { title: "SUMMER ESSENTIALS", items: ["All Summer","Resort Wear","Swimwear","Cover-Ups","Beach Bags","Sun Protection"] },
-      { title: "BY DESTINATION",    items: ["Tropical Getaway","European Summer","Beach Vacation","City Escape","Mountain Weekend"] },
-      { title: "SHOP BY STYLE",     items: ["Bohemian","Minimalist","Luxe Resort","Sporty Chic","Vintage-Inspired"] },
-    ],
-    featured: { title: "Resort Ready" },
-  },
-  Clothing: {
-    categories: [
-      { title: "CLOTHING",   items: ["All Clothing","Blazers","Coats & Jackets","Jeans","Knitwear","Blouses","Tops","Cardigans","Lingerie & Bodysuits"] },
-      { title: "",           items: ["Leather Jackets","Trench Coats","Trousers","Straight Leg Jeans","Skirts","Pencil Skirts","Shorts","Suits","Matching Sets"] },
-      { title: "ESSENTIALS", items: ["Swimwear","Sport","Lingerie","Shapewear","Sleepwear","Loungewear"] },
-    ],
-    featured: { title: "Spring Essentials" },
-  },
-  Dresses: {
-    categories: [
-      { title: "SHOP BY STYLE",    items: ["All Dresses","Midi Dresses","Maxi Dresses","Mini Dresses","Shirt Dresses","Wrap Dresses","Slip Dresses","Bodycon Dresses"] },
-      { title: "SHOP BY OCCASION", items: ["Casual","Work","Evening","Wedding Guest","Vacation","Brunch"] },
-      { title: "FEATURED",         items: ["Best Sellers","New In","Designer Dresses","Under $200","Under $500"] },
-    ],
-    featured: { title: "Dress Edit" },
-  },
-  Brands: {
-    categories: [
-      { title: "LUXURY",       items: ["The Row","Bottega Veneta","Celine","Loro Piana","Brunello Cucinelli","Valentino","Loewe"] },
-      { title: "CONTEMPORARY", items: ["Toteme","Jacquemus","A.P.C.","Sandro","Maje","AMI Paris","Isabel Marant","Acne Studios"] },
-      { title: "SUSTAINABLE",  items: ["Stella McCartney","Reformation","Eileen Fisher","Nanushka","Veja","Ganni","Staud"] },
-    ],
-    featured: { title: "Brand Directory" },
-  },
-  Active: {
-    categories: [
-      { title: "ACTIVEWEAR",  items: ["All Activewear","Sports Bras","Leggings","Shorts","Tops","Jackets","Sets"] },
-      { title: "BY ACTIVITY", items: ["Running","Yoga","Gym","Tennis","Swimming","Hiking"] },
-      { title: "BRANDS",      items: ["Lululemon","Alo Yoga","Sweaty Betty","Varley","Vuori"] },
-    ],
-    featured: { title: "Active Edit" },
-  },
-  Shoes: {
-    categories: [
-      { title: "SHOP BY TYPE",  items: ["All Shoes","Heels","Boots","Trainers","Loafers","Sandals","Mules","Ballet Flats","Platforms"] },
-      { title: "SHOP BY BRAND", items: ["Manolo Blahnik","Jimmy Choo","Bottega Veneta","Toteme","The Row","Jacquemus","Gianvito Rossi"] },
-      { title: "TRENDING NOW",  items: ["Ballet Flats","Western Boots","Kitten Heels","Chunky Trainers","Mule Sandals"] },
-    ],
-    featured: { title: "Shoe Edit" },
-  },
-  Bags: {
-    categories: [
-      { title: "SHOP BY TYPE",  items: ["All Bags","Tote Bags","Shoulder Bags","Crossbody Bags","Clutches","Mini Bags","Backpacks","Belt Bags"] },
-      { title: "SHOP BY BRAND", items: ["Bottega Veneta","Jacquemus","Loewe","The Row","Celine","Polène","Mansur Gavriel","Staud"] },
-      { title: "TRENDING",      items: ["The Woven Bag","Mini Bags","East-West Styles","Raffia","Leather Classics"] },
-    ],
-    featured: { title: "Bag Edit" },
-  },
-  Accessories: {
-    categories: [
-      { title: "JEWELLERY",   items: ["All Jewellery","Rings","Earrings","Necklaces","Bracelets","Fine Jewellery"] },
-      { title: "ACCESSORIES", items: ["Sunglasses","Scarves","Belts","Hats","Hair Accessories","Wallets & Cardholders"] },
-      { title: "BRANDS",      items: ["Bottega Veneta","The Row","Loewe","Sophie Buhai","Completedworks","Alighieri"] },
-    ],
-    featured: { title: "Accessories Edit" },
-  },
-  Beauty: {
-    categories: [
-      { title: "SKINCARE",  items: ["Moisturisers","Serums","Cleansers","SPF","Eye Care","Masks","Toners"] },
-      { title: "MAKEUP",    items: ["Foundation","Blush","Lip","Eye","Bronzer","Primers","Setting Sprays"] },
-      { title: "FRAGRANCE", items: ["Perfume","Eau de Toilette","Body Mist","Candles","Discovery Sets","Niche Brands"] },
-    ],
-    featured: { title: "Beauty Edit" },
-  },
-}
+const NAV_ITEMS = [
+  { label: "What's New", href: '/whats-new', megaMenu: null },
+  { label: 'Summer', megaMenu: { cols: [
+    { title: 'Shop by Category', links: ['Dresses','Tops','Shorts','Swimwear','Sandals'] },
+    { title: 'Summer Edits', links: ['Resort Wear','Beach Essentials','Sun Dresses','Linen Collection'] },
+    { title: 'Trending Now', links: ['Coastal Chic','Maximalist Prints','Sheer Layers','Bold Colour'] },
+  ]}},
+  { label: 'Brands', href: '/brands', megaMenu: null },
+  { label: 'Clothing', megaMenu: { cols: [
+    { title: 'Tops', links: ['Blouses','T-Shirts','Knitwear','Shirts','Bodysuits'] },
+    { title: 'Bottoms', links: ['Trousers','Jeans','Skirts','Shorts','Leggings'] },
+    { title: 'Outerwear', links: ['Coats','Jackets','Blazers','Gilets'] },
+  ]}},
+  { label: 'Dresses', megaMenu: { cols: [
+    { title: 'Style', links: ['Midi','Maxi','Mini','Wrap','Slip'] },
+    { title: 'Occasion', links: ['Party','Wedding Guest','Casual','Work'] },
+    { title: 'Edit', links: ['New Arrivals','Under £100','Designer','Sustainable'] },
+  ]}},
+  { label: 'Shoes', megaMenu: { cols: [
+    { title: 'Type', links: ['Heels','Flats','Boots','Sandals','Trainers'] },
+    { title: 'Shop', links: ['New In','Sale','Designer','Under £50'] },
+  ]}},
+  { label: 'Bags', href: '/bags', megaMenu: null },
+  { label: 'Accessories', href: '/accessories', megaMenu: null },
+  { label: 'Beauty', href: '/beauty', megaMenu: null },
+  { label: 'Editorial', href: '/editorial', megaMenu: null },
+];
 
-const editorialCategories = {
-  col1: ["Lifestyle","Fashion","Trending Styles","Brand Stories","View All"],
-  col2: ["Our Mission","Sustainability","Environmental Friendly","View All"],
-}
+const SEARCH_RESULTS = [
+  { name: 'Silk Slip Dress', price: '$285.00' },
+  { name: 'Linen Blazer', price: '$390.00' },
+  { name: 'Cashmere Crew Knit', price: '$420.00' },
+  { name: 'Wide-Leg Trousers', price: '$175.00' },
+];
 
-const editorialStories = [
-  { category: "FASHION",   title: "Most Wanted",                                          time: "8 HRS AGO" },
-  { category: "LIFESTYLE", title: "The Must-See Movies To Add To Your Watch List",        time: "8 HRS AGO" },
-  { category: "FASHION",   title: "How To Master Off-Duty Style Like Zoë, Kendall & Co.", time: "16 APR '26" },
-]
+export default function Header() {
+  const [openMenu, setOpenMenu] = useState(null);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [signinOpen, setSigninOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const searchInputRef = useRef(null);
+  const navRef = useRef(null);
 
-const navLinks = ["What's New","Summer","Brands","Clothing","Dresses","Active","Shoes","Bags","Accessories","Beauty","Editorial"]
+  useEffect(() => {
+    const handleClick = e => { if (navRef.current && !navRef.current.contains(e.target)) setOpenMenu(null); };
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, []);
 
-export default function Header({ setPage }) {
-  const [activeMenu, setActiveMenu] = useState(null)
+  useEffect(() => {
+    if (searchOpen && searchInputRef.current) setTimeout(() => searchInputRef.current.focus(), 50);
+  }, [searchOpen]);
 
-  const pageMap = {
-    "What's New":'plp', Summer:'plp', Brands:'brands', Clothing:'plp',
-    Dresses:'plp', Active:'plp', Shoes:'plp', Bags:'plp',
-    Accessories:'plp', Beauty:'plp', Editorial:'blog',
-  }
+  useEffect(() => {
+    const handleKey = e => { if (e.key === 'Escape') { setOpenMenu(null); setSearchOpen(false); setSigninOpen(false); } };
+    document.addEventListener('keydown', handleKey);
+    return () => document.removeEventListener('keydown', handleKey);
+  }, []);
 
-  const handleNav = (label) => { setPage(pageMap[label] || 'plp'); setActiveMenu(null) }
-  const menuData   = activeMenu ? megaMenuData[activeMenu] : null
-  const isEditorial = activeMenu === 'Editorial'
-  const showMenu   = activeMenu && (menuData || isEditorial)
+  useEffect(() => {
+    document.body.style.overflow = (searchOpen || signinOpen) ? 'hidden' : '';
+    return () => { document.body.style.overflow = ''; };
+  }, [searchOpen, signinOpen]);
 
   return (
-    <header className="header" onMouseLeave={() => setActiveMenu(null)}>
-
-      {/* ── Utility Bar ── */}
-      <div className="utility-bar">
-        <div className="utility-left">
-          <button className="utility-btn">
-            <span className="material-icons" style={{fontSize:'0.9375rem',verticalAlign:'middle'}}>language</span> EN
-          </button>
-          <button className="utility-btn">USD</button>
-          <button className="utility-btn">Need Help?</button>
+    <>
+      <header className="header">
+        <div className="utility-bar">
+          <div className="utility-left">
+            <button className="utility-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg><span>Account</span></button>
+            <button className="utility-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M3 6h18M3 12h18M3 18h18"/></svg><span>Menu</span></button>
+          </div>
+          <a href="/" className="utility-logo">Viva Voce</a>
+          <div className="utility-right">
+            <button className="icon-btn" aria-label="Search" onClick={() => { setSearchOpen(true); setSigninOpen(false); setOpenMenu(null); }}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg></button>
+            <button className="icon-btn" aria-label="Account" onClick={() => { setSigninOpen(s => !s); setSearchOpen(false); setOpenMenu(null); }}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg></button>
+            <button className="icon-btn" aria-label="Cart"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg><span className="cart-badge">2</span></button>
+          </div>
         </div>
+        <nav className="main-nav" ref={navRef}>
+          {NAV_ITEMS.map(item => {
+            if (!item.megaMenu) return <div key={item.label} className="nav-item"><a href={item.href} className={`nav-btn${item.label==="What's New"?' is-active':''}`}>{item.label}</a></div>;
+            const isOpen = openMenu === item.label;
+            return (<div key={item.label} className="nav-item">
+              <button className="nav-btn" aria-expanded={isOpen} onClick={() => setOpenMenu(isOpen ? null : item.label)}>
+                {item.label}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M6 9l6 6 6-6"/></svg>
+              </button>
+              <div className={`mega-menu${isOpen?' is-open':''}`}>
+                <div className="mega-menu-inner">
+                  {item.megaMenu.cols.map(col => <div key={col.title} className="mega-col">
+                    <div className="mega-col-title">{col.title}</div>
+                    {col.links.map(l => <a key={l} href="#" className="mega-link">{l}</a>)}
+                  </div>)}
+                </div>
+              </div>
+            </div>);
+          })}
+        </nav>
+      </header>
 
-        <button className="logo" onClick={() => { setPage('home'); setActiveMenu(null) }}>
-          viva voce
-        </button>
-
-        <div className="utility-right">
-          <span className="utility-shipping">FREE Shipping &amp; Returns.</span>
-          <button className="utility-btn" onClick={() => setPage('account')}>Sign In / Register</button>
-          <button className="icon-btn" onClick={() => setPage('account')} title="Wishlist">
-            <span className="material-icons">favorite_border</span>
-          </button>
-          <div className="cart-wrap">
-            <button className="icon-btn" onClick={() => setPage('cart')} title="Shopping Bag">
-              <span className="material-icons">shopping_bag</span>
+      <div className={`search-overlay${searchOpen?' is-open':''}`} role="dialog" aria-modal="true">
+        <div className="search-mask" onClick={() => setSearchOpen(false)} />
+        <div className="search-panel">
+          <div className="search-input-row">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>
+            <input ref={searchInputRef} className="search-input" type="search" placeholder="Search" value={searchQuery} onChange={e => setSearchQuery(e.target.value)} />
+            <button className="search-close-btn" onClick={() => setSearchOpen(false)} aria-label="Close">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
             </button>
-            <span className="cart-count">3</span>
+          </div>
+          <div className="search-results">
+            <div className="search-results-label">Products</div>
+            <div className="search-results-grid">
+              {SEARCH_RESULTS.map(item => (
+                <a key={item.name} href="#" className="search-result-card">
+                  <div className="search-result-image" />
+                  <div className="search-result-name">{item.name}</div>
+                  <div className="search-result-price">{item.price}</div>
+                </a>
+              ))}
+            </div>
           </div>
         </div>
       </div>
 
-      {/* ── Main Nav ── */}
-      <nav className="main-nav">
-        {navLinks.map(label => (
-          <button
-            key={label}
-            className={`nav-link ${activeMenu === label ? 'active' : ''}`}
-            onMouseEnter={() => setActiveMenu(label)}
-            onClick={() => handleNav(label)}
-          >
-            {label.toUpperCase()}
-          </button>
-        ))}
-      </nav>
-
-      {/* ── Mega Menu ── */}
-      {showMenu && (
-        <div className="mega-menu">
-          {isEditorial ? (
-
-            /* Editorial: 2-col links | 3 stories */
-            <div className="mega-editorial">
-              <div className="mega-ed-left">
-                <div className="mega-ed-cats">
-                  <div className="mega-ed-col-title">Editorial</div>
-                  <div>
-                    {editorialCategories.col1.map(item => (
-                      <button key={item} className="mega-ed-link" onClick={() => handleNav('Editorial')}>{item}</button>
-                    ))}
-                  </div>
-                  <div>
-                    {editorialCategories.col2.map(item => (
-                      <button key={item} className="mega-ed-link" onClick={() => handleNav('Editorial')}>{item}</button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              <div className="mega-ed-right">
-                <div className="mega-stories-title">Latest Stories</div>
-                {editorialStories.map((s, i) => (
-                  <button key={i} className="mega-story" onClick={() => handleNav('Editorial')}>
-                    <div className="mega-story-img wf-img" />
-                    <div className="mega-story-body">
-                      <div className="mega-story-cat">{s.category}</div>
-                      <div className="mega-story-title">{s.title}</div>
-                      <div className="mega-story-time">{s.time}</div>
-                    </div>
-                  </button>
-                ))}
-              </div>
+      <div className={`signin-overlay${signinOpen?' is-open':''}`} role="dialog" aria-modal="true">
+        <div className="signin-mask" onClick={() => setSigninOpen(false)} />
+        <div className="signin-panel">
+          <div className="signin-panel-inner">
+            <div className="signin-title">Account</div>
+            <a href="/account/login" className="signin-btn-shop">Sign in to Viva Voce</a>
+            <a href="/account/login/other" className="signin-btn-other">Other sign in options</a>
+            <div className="signin-divider">
+              <a href="/account/orders" className="signin-btn-secondary">Orders</a>
+              <a href="/account/profile" className="signin-btn-secondary">Profile</a>
             </div>
-
-          ) : (
-
-            /* Standard mega menu — no vertical dividers */
-            <div className="mega-standard">
-              <div className="mega-cols">
-                {menuData.categories.map((col, i) => (
-                  <div key={i} className="mega-col">
-                    {col.title && <div className="mega-col-title">{col.title}</div>}
-                    {col.items.map(item => (
-                      <button key={item} className="mega-link" onClick={() => handleNav(activeMenu)}>{item}</button>
-                    ))}
-                  </div>
-                ))}
-              </div>
-              <div className="mega-featured">
-                <div className="mega-featured-img wf-img" />
-                <div className="mega-featured-label">{menuData.featured?.title}</div>
-              </div>
-            </div>
-
-          )}
+          </div>
         </div>
-      )}
-    </header>
-  )
+      </div>
+    </>
+  );
 }
